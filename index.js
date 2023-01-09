@@ -56,3 +56,48 @@
 // View employees by department.
 // Delete departments, roles, and employees.
 // View the total utilized budget of a department—in other words, the combined salaries of all employees in that department.
+
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const cTable = require("console.table");
+// const con = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "",
+//   database: "employees_db",
+// });
+
+// con.connect((err) => {
+//   if (err) {
+//     throw err;
+//   }
+//   console.log("MySQL connected");
+// });
+
+// WHEN I start the application
+// THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+
+const startPrompt = () => {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "options",
+        message: "What would you like to do?",
+        choices: [
+          "View all departments",
+          "View all roles",
+          "View all employees",
+          "Add a department",
+          "Add a role",
+          "Add an employee",
+          "Update an employee role",
+        ],
+      },
+    ])
+    .then((answers) => {
+      console.log(answers);
+    });
+};
+
+startPrompt();
