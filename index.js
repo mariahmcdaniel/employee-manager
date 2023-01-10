@@ -60,19 +60,20 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-// const con = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "employees_db",
-// });
 
-// con.connect((err) => {
-//   if (err) {
-//     throw err;
-//   }
-//   console.log("MySQL connected");
-// });
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: null,
+  database: "employees_db",
+});
+
+connection.connect((err) => {
+  if (err) {
+    throw err;
+  }
+  console.log("MySQL connected");
+});
 
 // WHEN I start the application
 // THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
@@ -92,12 +93,79 @@ const startPrompt = () => {
           "Add a role",
           "Add an employee",
           "Update an employee role",
+          "Quit",
         ],
       },
     ])
     .then((answers) => {
-      console.log(answers);
+      const { options } = answers;
+      if (options === "View all departments") {
+        displayDepartments();
+      } else if (options === "View all roles") {
+        displayRoles();
+      } else if (options === "View all employees") {
+        displayEmployees();
+      } else if (options === "Add a department") {
+        addDepartment();
+      } else if (options === "Add a role") {
+        addRole();
+      } else if (options === "Add an employee") {
+        addEmployee();
+      } else if (options === "Update an employee role") {
+        updateRole();
+      } else {
+        con.end();
+      }
     });
+};
+
+const displayDepartments = () => {
+  console.log("DISPLAYING ALL DEPARTMENTS");
+  let sql = `SELECT * FROM department`;
+  connection.query(sql, (err, result) => {
+    if (err) {
+      throw err;
+    }
+    console.table(result);
+  });
+};
+
+const displayRoles = () => {
+  console.log("DISPLAYING ALL ROLES");
+  let sql = `SELECT * FROM role`;
+  connection.query(sql, (err, result) => {
+    if (err) {
+      throw err;
+    }
+    console.table(result);
+  });
+};
+
+const displayEmployees = () => {
+  console.log("DISPLAYING ALL EMPLOYEES");
+  let sql = `SELECT * FROM employee`;
+  connection.query(sql, (err, result) => {
+    if (err) {
+      throw err;
+    }
+    console.table(result);
+  });
+};
+
+const addDepartment = () => {
+  console.log("ADDING A DEPARTMENT");
+};
+
+const addRole = () => {
+  console.log("ADDING A ROLE");
+};
+
+const addEmployee = () => {
+  console.log("ADDING AN EMPLOYEE");
+};
+
+const updateRole = () => {
+  console.log("UPDATING EMPLOYEE ROLE");
 };
 
 startPrompt();
