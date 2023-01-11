@@ -87,7 +87,7 @@ const displayAll = async (type, display) => {
 };
 
 const insertInto = (type, data) => {
-  db.query(`INSERT INTO ?? SET ?`[(type, data)], (err) => {
+  db.query(`INSERT INTO ?? SET ?`, [type, data], (err) => {
     if (err) {
       throw err;
     }
@@ -96,14 +96,31 @@ const insertInto = (type, data) => {
   });
 };
 
-const generateOptions = (type, info, val) => {
-  return db.promise().query(`SELECT ?? AS ${info} FROM ??`, [info, val, type]);
+const generateOptions = (type, info, val, info2) => {
+  if (info2) {
+    return db
+      .promise()
+      .query(`SELECT CONCAT(??,' ', ??) AS name, ?? AS value FROM ??`, [
+        info,
+        info2,
+        val,
+        type,
+      ]);
+  }
+  return db
+    .promise()
+    .query(`SELECT ?? AS name, ?? AS value FROM ??`, [info, val, type]);
 };
 
 const addEmployee = async () => {
   console.log("ADDING AN EMPLOYEE");
   const [roleOpt] = await generateOptions("roles", "title", "id");
-  const [managerOpt] = await generateOptions("employees", "last_name", "id");
+  const [managerOpt] = await generateOptions(
+    "employees",
+    "first_name",
+    "id",
+    "last_name"
+  );
   prompt([
     {
       name: "first_name",
@@ -116,17 +133,100 @@ const addEmployee = async () => {
     {
       type: "rawlist",
       name: "role_id",
-      message: "Choose a role for this employee",
+      message: "Choose a role for this employee:",
       choices: roleOpt,
     },
     {
       type: "rawlist",
       name: "manager_id",
-      message: "Choose a manager for this employee",
+      message: "Choose a manager for this employee:",
       choices: managerOpt,
     },
   ]).then((answers) => {
     insertInto("employees", answers);
+    console.log("Employee has been added!");
+  });
+};
+
+const addDepartment = () => {
+  console.log("ADDING A DEPARTMENT");
+  prompt([
+    {
+      name: "name",
+      message: "What is the name of the new department?",
+    },
+  ]).then((answers) => {
+    insertInto("departments", answers);
+    console.log("Department has been added!");
+  });
+};
+
+const addRole = async () => {
+  console.log("ADDING A ROLE");
+  const [departmentOpt] = await generateOptions("departments", "name", "id");
+  prompt([
+    {
+      name: "title",
+      message: "What is the title of the new role?",
+    },
+    {
+      name: "salary",
+      message: "What is the salary of the new role?",
+    },
+    {
+      type: "rawlist",
+      name: "department_id",
+      message: "Select the department that the new role belongs to:",
+      choices: departmentOpt,
+    },
+  ]).then((answers) => {
+    insertInto("roles", answers);
+    console.log("Role has been added!");
+  });
+};
+
+const updateRole = async () => {
+  console.log("UPDATING EMPLOYEE ROLE");
+  const [employeeOpt] = await generateOptions(
+    "employees",
+    "first_name",
+    "id",
+    "last_name"
+  );
+  const [roleOpt] = await generateOptions("roles", "title", "id");
+  const [managerOpt] = await generateOptions(
+    "employees",
+    "first_name",
+    "id",
+    "last_name"
+  );
+  prompt([
+    {
+      type: "rawlist",
+      name: "employeeId",
+      message: "Select the employee who's role you would like to update:",
+      choices: employeeOpt,
+    },
+    {
+      type: "rawlist",
+      name: "roleId",
+      message: "Select their new role",
+      choices: roleOpt,
+    },
+    {
+      type: "rawlist",
+      name: "managerId",
+      message: "Select their new manager:",
+      choices: managerOpt,
+    },
+  ]).then((answers) => {
+    console.log(answers);
+    const { employeeId, roleId, managerId } = answers;
+    db.query(
+      `UPDATE employees SET role_id = ${roleId}, manager_id = ${managerId} WHERE id = ${employeeId}`
+    );
+    console.log("Employee's role has been updated!");
+    init();
   });
 };
 
@@ -150,11 +250,11 @@ const init = () => {
   ]).then((answers) => {
     const { options } = answers;
     if (options === "View all departments") {
-      displayAll("departments");
+      displayAll("departments", true);
     } else if (options === "View all roles") {
-      displayAll("roles");
+      displayAll("roles", true);
     } else if (options === "View all employees") {
-      displayAll("employees");
+      displayAll("employees", true);
     } else if (options === "Add a department") {
       addDepartment();
     } else if (options === "Add a role") {
@@ -169,15 +269,4 @@ const init = () => {
   });
 };
 
-const addDepartment = () => {
-  console.log("ADDING A DEPARTMENT");
-  let sql = `INSERT INTO departments (name) VALUES `;
-};
-
-const addRole = () => {
-  console.log("ADDING A ROLE");
-};
-
-const updateRole = () => {
-  console.log("UPDATING EMPLOYEE ROLE");
-};
+init();
