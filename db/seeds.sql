@@ -1,3 +1,4 @@
+SET FOREIGN_KEY_CHECKS = 0;
 INSERT INTO departments (name)
 VALUES 
 ('Sales and Marketing'),
