@@ -42,7 +42,7 @@ Finally, type "exit" to close the mysql shell, and run the command
 
 ## Visuals
 
-[click here to view the demo](https://drive.google.com/file/d/1dh8mEX2hSvD-VanUALx1PSZOEJrBoaiy/view)
+[click here to view the demo](https://drive.google.com/file/d/10eIR8CKpLT91JaL8Nbcb5gNgRevIcdmm/view)
 
 ## Questions
 
