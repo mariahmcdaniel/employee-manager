@@ -189,6 +189,53 @@ const updateRole = async () => {
   });
 };
 
+// Update employee managers.
+
+const updateManager = async () => {
+  const [employeeOpt] = await generateOptions(
+    'employees',
+    'first_name',
+    'id',
+    'last_name'
+  );
+
+  const [managerOpt] = await generateOptions(
+    'employees',
+    'first_name',
+    'id',
+    'last_name'
+  );
+  prompt([
+    {
+      type: 'rawlist',
+      name: 'employeeId',
+      message: "Select the employee who's manager you would like to update:",
+      choices: employeeOpt,
+    },
+    {
+      type: 'rawlist',
+      name: 'managerId',
+      message: 'Select their new manager:',
+      choices: managerOpt,
+    },
+  ]).then((answers) => {
+    const { employeeId, managerId } = answers;
+    db.query(
+      `UPDATE employees SET manager_id = ${managerId} WHERE id = ${employeeId}`
+    );
+    console.log("\nEmployee's manager has been updated!\n");
+    init();
+  });
+};
+
+// View employees by manager.
+
+// View employees by department.
+
+// Delete departments, roles, and employees.
+
+// View the total utilized budget of a department—in other words, the combined salaries of all employees in that department.
+
 const init = () => {
   prompt([
     {
@@ -203,6 +250,7 @@ const init = () => {
         'Add a role',
         'Add an employee',
         'Update an employee role',
+        'Update an employee manager',
         'Quit',
       ],
     },
@@ -222,6 +270,8 @@ const init = () => {
       addEmployee();
     } else if (options === 'Update an employee role') {
       updateRole();
+    } else if (options === 'Update an employee manager') {
+      updateManager();
     } else {
       console.log('Goodbye!');
       db.end();
