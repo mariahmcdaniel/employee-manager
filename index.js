@@ -189,8 +189,6 @@ const updateRole = async () => {
   });
 };
 
-// Update employee managers.
-
 const updateManager = async () => {
   const [employeeOpt] = await generateOptions(
     'employees',
@@ -228,13 +226,12 @@ const updateManager = async () => {
   });
 };
 
-// View employees by manager.
-
-// View employees by department.
-
-// Delete departments, roles, and employees.
-
-// View the total utilized budget of a department—in other words, the combined salaries of all employees in that department.
+const employeesByDept = async () => {
+  const sql = `SELECT employees.first_name, employees.last_name, departments.name AS department FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN departments ON roles.department_id = departments.id`;
+  const [empByDep] = await db.promise().query(sql);
+  console.table(empByDep);
+  init();
+};
 
 const init = () => {
   prompt([
@@ -251,6 +248,7 @@ const init = () => {
         'Add an employee',
         'Update an employee role',
         'Update an employee manager',
+        'View employees by department',
         'Quit',
       ],
     },
@@ -272,6 +270,8 @@ const init = () => {
       updateRole();
     } else if (options === 'Update an employee manager') {
       updateManager();
+    } else if (options === 'View employees by department') {
+      employeesByDept();
     } else {
       console.log('Goodbye!');
       db.end();
